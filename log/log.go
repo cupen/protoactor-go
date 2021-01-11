@@ -83,7 +83,7 @@ func (l *Logger) newEvent(msg string, level Level, fields ...Field) Event {
 		Fields:  fields,
 	}
 	if l.enableCaller {
-		ev.Caller = newCallerInfo(2)
+		ev.Caller = newCallerInfo(3)
 	}
 	return ev
 }

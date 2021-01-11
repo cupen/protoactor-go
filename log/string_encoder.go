@@ -91,10 +91,16 @@ func (l *ioLogger) writeEvent(e Event) {
 	var buf = bytes.Buffer{}
 	l.formatHeader(&buf, e.Prefix, e.Time, e.Level)
 	if e.Caller.line > 0 {
-		buf.WriteString(e.Caller.ShortFileName())
+		fname := e.Caller.ShortFileName()
+		buf.WriteString(fname)
 		buf.WriteByte(':')
 		buf.WriteString(strconv.Itoa(e.Caller.line))
-		buf.WriteByte('\t')
+		if v := (32 - len(fname)); v > 16 {
+			buf.WriteByte('\t')
+			buf.WriteByte('\t')
+		} else {
+			buf.WriteByte('\t')
+		}
 	}
 	if len(e.Message) > 0 {
 		buf.WriteString(e.Message)

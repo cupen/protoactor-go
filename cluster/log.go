@@ -13,4 +13,5 @@ var (
 // SetLogLevel is safe to call concurrently
 func SetLogLevel(level log.Level) {
 	plog.SetLevel(level)
+	plog = plog.WithCaller()
 }
