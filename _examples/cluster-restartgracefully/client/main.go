@@ -14,6 +14,7 @@ import (
 	"github.com/asynkron/protoactor-go/actor"
 	"github.com/asynkron/protoactor-go/cluster"
 	"github.com/asynkron/protoactor-go/cluster/clusterproviders/consul"
+	"github.com/asynkron/protoactor-go/cluster/clusterproviders/etcd"
 	"github.com/asynkron/protoactor-go/log"
 	"github.com/asynkron/protoactor-go/remote"
 )
@@ -58,8 +59,8 @@ func startNode(port int, provider string) {
 		ttl := consul.WithTTL(100 * time.Millisecond)
 		refreshTTL := consul.WithRefreshTTL(100 * time.Millisecond)
 		cp, err = consul.New(ttl, refreshTTL)
-	// case "etcd":
-	//	cp, err = etcd.New()
+	case "etcd":
+		cp, err = etcd.New()
 	default:
 		panic(fmt.Errorf("invalid provider:%s", provider))
 	}
@@ -105,7 +106,8 @@ func runClient(grainId string, loops int, interval time.Duration) {
 	calcGrain := shared.GetCalculatorGrainClient(_cluster, grainId)
 	resp, err := calcGrain.GetCurrent(&shared.Void{}, cluster.WithRetry(3), cluster.WithTimeout(6*time.Second))
 	if err != nil {
-		_cluster.Shutdown(true)
+		// _cluster.Shutdown(true)
+		plog.Warn("call grain failed", log.Error(err))
 		panic(err)
 	}
 	baseNumber := resp.Number

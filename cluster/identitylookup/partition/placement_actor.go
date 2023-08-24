@@ -34,6 +34,8 @@ func (p *placementActor) Receive(ctx actor.Context) {
 		plog.Info("Placement actor stopped")
 	case *actor.Terminated:
 		p.onTerminated(msg, ctx)
+	case actor.AutoReceiveMessage:
+		// pass
 	case *clustering.IdentityHandoverRequest:
 		p.onIdentityHandoverRequest(msg, ctx)
 	case *clustering.ActivationRequest:

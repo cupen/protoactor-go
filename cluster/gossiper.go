@@ -58,6 +58,7 @@ func newGossiper(cl *Cluster, opts ...Option) (*Gossiper, error) {
 		GossipActorName: DefaultGossipActorName,
 		cluster:         cl,
 		close:           make(chan struct{}),
+		throttler:       func() actor.Valve { return actor.Open },
 	}
 
 	// apply any given options

@@ -6,15 +6,16 @@ interval:=0ms
 env=prod
 
 start:
+	go build -o /tmp/server ./server/*
 	tmux new-session -d -s eg
 	tmux setenv -t eg PROTO_ACTOR_ENV $(env)
 	tmux split-window -t "eg:0"   -v
 	tmux split-window -t "eg:0.0" -h -p 66
 	tmux split-window -t "eg:0.1" -h -p 50
 	tmux select-pane -t "eg:0.3"
-	tmux send-keys -t "eg:0.0" "go run server/main.go --provider $(cp) --ttl $(ttl) --port 9991" Enter
-	tmux send-keys -t "eg:0.1" "go run server/main.go --provider $(cp) --ttl $(ttl) --port 9992" Enter
-	tmux send-keys -t "eg:0.2" "go run server/main.go --provider $(cp) --ttl $(ttl) --port 9993" Enter
+	tmux send-keys -t "eg:0.0" "/tmp/server --provider $(cp) --ttl $(ttl) --port 9991" Enter
+	tmux send-keys -t "eg:0.1" "/tmp/server --provider $(cp) --ttl $(ttl) --port 9992" Enter
+	tmux send-keys -t "eg:0.2" "/tmp/server --provider $(cp) --ttl $(ttl) --port 9993" Enter
 	tmux send-keys -t "eg:0.3" "sleep 2 && go run client/main.go --provider $(cp) --clients $(clients) --loops $(loops) --interval $(interval) " Enter
 	# tmux send-keys -t "eg:0.2" "go run member/main.go" Enter
 	tmux attach -t eg
