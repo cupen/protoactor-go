@@ -112,9 +112,12 @@ func Error(err error) Field {
 // Stack constructs a Field that stores a stacktrace under the key "stacktrace".
 //
 // This is eager and therefore an expensive operation.
+
 func Stack() Field {
 	var name, file string
+	var namePrev, filePrev string
 	var line int
+	var linePrev int
 	var pc [16]uintptr
 
 	n := runtime.Callers(4, pc[:])
@@ -128,18 +131,28 @@ func Stack() Field {
 		if !strings.HasPrefix(name, "runtime.") || !more {
 			break
 		}
+		namePrev = name
+		filePrev = file
+		linePrev = line
 	}
 
-	var str string
-	switch {
-	case name != "":
-		str = fmt.Sprintf("%v:%v", name, line)
-	case file != "":
-		str = fmt.Sprintf("%v:%v", file, line)
-	default:
+	var str = _formatStacktrace(name, file, line)
+	if str == "" {
 		str = fmt.Sprintf("pc:%x", pc)
+	} else {
+		str += " => " + _formatStacktrace(namePrev, filePrev, linePrev)
 	}
 	return String("stacktrace", str)
+}
+
+func _formatStacktrace(name, file string, line int) string {
+	if name != "" {
+		return fmt.Sprintf("%s:%d", name, line)
+	} else if file != "" {
+		return fmt.Sprintf("%s:%d", file, line)
+	} else {
+		return ""
+	}
 }
 
 // Duration constructs a Field with the given key and value.
